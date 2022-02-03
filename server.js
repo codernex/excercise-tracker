@@ -58,12 +58,15 @@ res.json(user)
 //Excercise Endpoint
 
 app.post("/api/users/:_id/exercises",async(req,res)=>{
-  const{description,duration,date}=req.body
+  let{description,duration,date}=req.body
   const{_id}=req.params
-  let excercise=await ExModel.create({description,duration:parseInt(duration),date})
-  if(excercise.date===""){
-    excercise.date=new Date(Date.now()).toISOString().substr(0,10)
+    if (date == '') {
+    date = new Date().toDateString()
+  } else {
+    date = new Date(date).toDateString()
   }
+  if(date == 'Invalid Date')  {date = new Date().toDateString()}
+  let excercise=await ExModel.create({description,duration:parseInt(duration),date})
   await User.findByIdAndUpdate(_id,{$push:{log:excercise} },{new:true},(err,user)=>{
     let responseObj={}
     responseObj["_id"]=user._id
